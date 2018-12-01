@@ -31,6 +31,8 @@ public final class ChannelUtils {
     }
 
     public static EventLoopGroup getEventLoopGroup(int threads) {
-        return Epoll.isAvailable() ? new EpollEventLoopGroup(threads) : new NioEventLoopGroup(threads);
+        return Epoll.isAvailable() ?
+                new EpollEventLoopGroup(threads, new DenseThreadFactory()) :
+                new NioEventLoopGroup(threads, new DenseThreadFactory());
     }
 }
