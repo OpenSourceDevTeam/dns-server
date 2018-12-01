@@ -17,13 +17,20 @@
 package com.opensdt.dense.channel;
 
 import io.netty.channel.Channel;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollDatagramChannel;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 
 public final class ChannelUtils {
 
     public static Class<? extends Channel> getChannel() {
         return Epoll.isAvailable() ? EpollDatagramChannel.class : NioDatagramChannel.class;
+    }
+
+    public static EventLoopGroup getEventLoopGroup(int threads) {
+        return Epoll.isAvailable() ? new EpollEventLoopGroup(threads) : new NioEventLoopGroup(threads);
     }
 }

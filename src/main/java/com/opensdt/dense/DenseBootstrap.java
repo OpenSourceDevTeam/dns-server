@@ -16,9 +16,30 @@
 
 package com.opensdt.dense;
 
+import com.opensdt.dense.channel.ChannelUtils;
+import com.opensdt.dense.pipeline.DenseChannelInitializer;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.EventLoopGroup;
+
 public class DenseBootstrap {
 
     public static void main(String[] args) {
-
+        EventLoopGroup boss = ChannelUtils.getEventLoopGroup(1);
+        try {
+            new Bootstrap()
+                    .group(boss)
+                    .channel(ChannelUtils.getChannel())
+                    .handler(new DenseChannelInitializer())
+                    // TODO: Configurable bind IP
+                    .bind(53)
+                    .sync()
+                    .channel()
+                    .closeFuture()
+                    .sync();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            boss.shutdownGracefully();
+        }
     }
 }
