@@ -20,6 +20,7 @@ import com.opensdt.dense.pipeline.handler.DnsChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.handler.codec.dns.DatagramDnsQueryDecoder;
+import io.netty.handler.codec.dns.DatagramDnsResponseEncoder;
 
 public class DenseChannelInitializer extends ChannelInitializer<DatagramChannel> {
 
@@ -27,7 +28,7 @@ public class DenseChannelInitializer extends ChannelInitializer<DatagramChannel>
     protected void initChannel(DatagramChannel ch) throws Exception {
         ch.pipeline()
                 .addLast(new DatagramDnsQueryDecoder())
-                .addLast(new DatagramDnsQueryDecoder())
+                .addLast(new DatagramDnsResponseEncoder())
                 .addLast(new DnsChannelHandler());
     }
 }
