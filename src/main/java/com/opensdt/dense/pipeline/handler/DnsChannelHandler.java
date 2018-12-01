@@ -23,19 +23,23 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.dns.DatagramDnsQuery;
 import io.netty.handler.codec.dns.DnsRecord;
 import io.netty.handler.codec.dns.DnsSection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DnsChannelHandler extends SimpleChannelInboundHandler<DatagramDnsQuery> {
+
+    private static Logger logger = LoggerFactory.getLogger(DnsChannelHandler.class);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramDnsQuery query) throws Exception {
         DnsRecord question = query.recordAt(DnsSection.QUESTION);
 
-        System.out.println("Request: " + question.type() + " - " + question.name());
+        logger.info("Request: {} - {}", question.type(), question.name());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
+        logger.error("Error in channel handler", cause);
 
         if (ctx.channel().isActive()) {
             ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);

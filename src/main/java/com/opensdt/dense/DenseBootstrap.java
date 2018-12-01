@@ -20,10 +20,16 @@ import com.opensdt.dense.channel.ChannelUtils;
 import com.opensdt.dense.pipeline.DenseChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DenseBootstrap {
 
+    private static Logger logger = LoggerFactory.getLogger(DenseBootstrap.class);
+
     public static void main(String[] args) {
+        logger.info("Bootstrapping dense DNS Server");
+
         EventLoopGroup boss = ChannelUtils.getEventLoopGroup(1);
         try {
             new Bootstrap()
@@ -36,8 +42,8 @@ public class DenseBootstrap {
                     .channel()
                     .closeFuture()
                     .sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         } finally {
             boss.shutdownGracefully();
         }
