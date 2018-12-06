@@ -16,7 +16,7 @@ public class ResolverPipeline {
      * @return result ANSWER dns record or null, if domain coulnd't be resolved (e.q. if it doesn't exists in this resolver)
      */
     public DnsRecord resolve(DnsRecord question) {
-        //try all resolvers and return the first one which can handle the request
+        // try all resolvers and return the first one which can handle the request
         for (ObjectCursor<Resolver> cursor : this.resolverList) {
             DnsRecord result = cursor.value.resolve(question);
 

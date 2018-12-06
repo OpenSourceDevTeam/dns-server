@@ -5,7 +5,7 @@ import io.netty.handler.codec.dns.DnsRecord;
 public interface Resolver {
 
     /**
-    * resolve domain name
+     * resolve domain name
      *
      * @param question dns question
      *
