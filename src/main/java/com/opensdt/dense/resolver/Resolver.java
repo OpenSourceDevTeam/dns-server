@@ -11,6 +11,6 @@ public interface Resolver {
      *
      * @return result ANSWER dns record or null, if domain coulnd't be resolved (e.q. if it doesn't exists in this resolver)
     */
-    public DnsRecord resolve (DnsRecord question);
+    public DnsRecord resolve(DnsRecord question);
 
 }
