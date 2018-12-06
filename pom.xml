@@ -31,6 +31,9 @@
         <netty.version>4.1.32.Final</netty.version>
         <logback.version>1.2.3</logback.version>
         <maven.compiler.version>3.8.0</maven.compiler.version>
+
+        <!-- hppc, high performance lists & maps, https://github.com/carrotsearch/hppc -->
+        <hppc.version>0.8.1</hppc.version>
     </properties>
 
     <dependencies>
@@ -46,6 +49,13 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+
+        <!-- High Performance Primitive Collections for Java, https://github.com/carrotsearch/hppc -->
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
+            <version>${hppc.version}</version>
         </dependency>
     </dependencies>
 
