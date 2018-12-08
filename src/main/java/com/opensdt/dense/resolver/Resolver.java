@@ -5,12 +5,11 @@ import io.netty.handler.codec.dns.DnsRecord;
 public interface Resolver {
 
     /**
-     * resolve domain name
+     * Resolves the domain queried in the question section.
      *
-     * @param question dns question
+     * @param question The DNS question section record.
      *
-     * @return result ANSWER dns record or null, if domain coulnd't be resolved (e.q. if it doesn't exists in this resolver)
+     * @return Returns the DNS answer section record or null, if the domain couldn't be resolved (e.q. if it doesn't exists in this resolver).
     */
-    public DnsRecord resolve(DnsRecord question);
-
+    DnsRecord resolve(DnsRecord question);
 }
