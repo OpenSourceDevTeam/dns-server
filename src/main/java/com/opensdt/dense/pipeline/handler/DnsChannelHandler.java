@@ -52,7 +52,13 @@ public class DnsChannelHandler extends SimpleChannelInboundHandler<DatagramDnsQu
         DnsRecord answer = resolverPipeline.resolve(question);
 
         DatagramDnsResponse response = new DatagramDnsResponse(query.recipient(), query.sender(), query.id());
-        response.addRecord(DnsSection.ANSWER, answer);
+
+        if (answer != null) {
+            response.addRecord(DnsSection.ANSWER, answer);
+        } else {
+            // If we don't have an answer, return "Non-Existent Domain"
+            response.setCode(DnsResponseCode.NXDOMAIN);
+        }
 
         ctx.writeAndFlush(response);
     }
