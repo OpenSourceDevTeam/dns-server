@@ -16,8 +16,7 @@
 
 package com.opensdt.dense.pipeline.handler;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
+import com.opensdt.dense.resolver.ResolverPipeline;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,11 +25,15 @@ import io.netty.handler.codec.dns.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
-
 public class DnsChannelHandler extends SimpleChannelInboundHandler<DatagramDnsQuery> {
 
     private static Logger logger = LoggerFactory.getLogger(DnsChannelHandler.class);
+
+    private ResolverPipeline resolverPipeline;
+
+    public DnsChannelHandler(ResolverPipeline resolverPipeline) {
+        this.resolverPipeline = resolverPipeline;
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramDnsQuery query) throws Exception {
@@ -38,19 +41,20 @@ public class DnsChannelHandler extends SimpleChannelInboundHandler<DatagramDnsQu
 
         logger.info("Request: {} - {}", question.type(), question.name());
 
-        // Test response for an A record
-        if (question.type() == DnsRecordType.A) {
+        // We currently only support A, AAAA and MX
+        if (question.type() != DnsRecordType.A && question.type() != DnsRecordType.AAAA && question.type() != DnsRecordType.MX) {
             DatagramDnsResponse response = new DatagramDnsResponse(query.recipient(), query.sender(), query.id());
-
-            ByteBuf buffer = PooledByteBufAllocator.DEFAULT.buffer();
-            byte[] address = new InetSocketAddress("127.0.0.1", 0).getAddress().getAddress();
-            // Write all 4 octets from the IP address
-            buffer.writeBytes(address);
-
-            response.addRecord(DnsSection.ANSWER, new DefaultDnsRawRecord(question.name(), DnsRecordType.A, 30, buffer));
-
+            response.setCode(DnsResponseCode.NOTIMP);
             ctx.writeAndFlush(response);
+            return;
         }
+
+        DnsRecord answer = resolverPipeline.resolve(question);
+
+        DatagramDnsResponse response = new DatagramDnsResponse(query.recipient(), query.sender(), query.id());
+        response.addRecord(DnsSection.ANSWER, answer);
+
+        ctx.writeAndFlush(response);
     }
 
     @Override
