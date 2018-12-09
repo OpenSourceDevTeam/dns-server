@@ -17,6 +17,7 @@
 package com.opensdt.dense;
 
 import com.opensdt.dense.channel.ChannelUtils;
+import com.opensdt.dense.config.Config;
 import com.opensdt.dense.pipeline.DenseChannelInitializer;
 import com.opensdt.dense.resolver.ResolverPipeline;
 import com.opensdt.dense.resolver.external.impl.StandardExternalResolver;
@@ -51,8 +52,7 @@ public class DenseBootstrap {
                     .group(boss)
                     .channel(ChannelUtils.getChannel())
                     .handler(new DenseChannelInitializer(resolverPipeline))
-                    // TODO: Configurable bind IP
-                    .bind(53)
+                    .bind(Config.getString("ip", "localhost"), Config.getInteger("port", 53))
                     .sync()
                     .channel()
                     .closeFuture()
