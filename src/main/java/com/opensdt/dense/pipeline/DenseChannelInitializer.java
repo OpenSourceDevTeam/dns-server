@@ -17,6 +17,7 @@
 package com.opensdt.dense.pipeline;
 
 import com.opensdt.dense.pipeline.handler.DnsChannelHandler;
+import com.opensdt.dense.resolver.ResolverPipeline;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.handler.codec.dns.DatagramDnsQueryDecoder;
@@ -24,11 +25,17 @@ import io.netty.handler.codec.dns.DatagramDnsResponseEncoder;
 
 public class DenseChannelInitializer extends ChannelInitializer<DatagramChannel> {
 
+    private ResolverPipeline resolverPipeline;
+
+    public DenseChannelInitializer(ResolverPipeline resolverPipeline) {
+        this.resolverPipeline = resolverPipeline;
+    }
+
     @Override
     protected void initChannel(DatagramChannel ch) throws Exception {
         ch.pipeline()
                 .addLast(new DatagramDnsQueryDecoder())
                 .addLast(new DatagramDnsResponseEncoder())
-                .addLast(new DnsChannelHandler());
+                .addLast(new DnsChannelHandler(this.resolverPipeline));
     }
 }

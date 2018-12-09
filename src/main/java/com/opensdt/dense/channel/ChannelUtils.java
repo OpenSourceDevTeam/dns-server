@@ -16,17 +16,17 @@
 
 package com.opensdt.dense.channel;
 
-import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 
 public final class ChannelUtils {
 
-    public static Class<? extends Channel> getChannel() {
+    public static Class<? extends DatagramChannel> getChannel() {
         return Epoll.isAvailable() ? EpollDatagramChannel.class : NioDatagramChannel.class;
     }
 

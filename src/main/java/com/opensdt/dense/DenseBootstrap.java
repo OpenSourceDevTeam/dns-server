@@ -18,10 +18,17 @@ package com.opensdt.dense;
 
 import com.opensdt.dense.channel.ChannelUtils;
 import com.opensdt.dense.pipeline.DenseChannelInitializer;
+import com.opensdt.dense.resolver.ResolverPipeline;
+import com.opensdt.dense.resolver.external.impl.StandardExternalResolver;
+import com.opensdt.dense.resolver.impl.GlobalResolver;
+import com.opensdt.dense.resolver.impl.LocalHostsResolver;
+import com.opensdt.dense.resolver.impl.LocalZoneResolver;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
 
 public class DenseBootstrap {
 
@@ -30,12 +37,20 @@ public class DenseBootstrap {
     public static void main(String[] args) {
         logger.info("Bootstrapping dense DNS Server");
 
+        ResolverPipeline resolverPipeline = new ResolverPipeline();
+        resolverPipeline.addResolver(new LocalHostsResolver());
+        resolverPipeline.addResolver(new LocalZoneResolver());
+
+        InetSocketAddress address = new InetSocketAddress("1.1.1.1", 53);
+        StandardExternalResolver externalResolver = new StandardExternalResolver(address);
+        resolverPipeline.addResolver(new GlobalResolver(externalResolver));
+
         EventLoopGroup boss = ChannelUtils.getEventLoopGroup(1);
         try {
             new Bootstrap()
                     .group(boss)
                     .channel(ChannelUtils.getChannel())
-                    .handler(new DenseChannelInitializer())
+                    .handler(new DenseChannelInitializer(resolverPipeline))
                     // TODO: Configurable bind IP
                     .bind(53)
                     .sync()

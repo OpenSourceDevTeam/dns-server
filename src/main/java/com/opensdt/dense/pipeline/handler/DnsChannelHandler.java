@@ -49,7 +49,7 @@ public class DnsChannelHandler extends SimpleChannelInboundHandler<DatagramDnsQu
             return;
         }
 
-        DnsRecord answer = resolverPipeline.resolve(question);
+        DnsRecord answer = this.resolverPipeline.resolve(question);
 
         DatagramDnsResponse response = new DatagramDnsResponse(query.recipient(), query.sender(), query.id());
 
