@@ -18,7 +18,9 @@ package com.opensdt.dense.resolver.external.impl;
 
 import com.opensdt.dense.channel.ChannelUtils;
 import com.opensdt.dense.resolver.external.ExternalResolver;
-import io.netty.handler.codec.dns.DnsRecordType;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.AddressedEnvelope;
+import io.netty.handler.codec.dns.*;
 import io.netty.resolver.dns.DnsNameResolver;
 import io.netty.resolver.dns.DnsNameResolverBuilder;
 import io.netty.resolver.dns.SingletonDnsServerAddressStreamProvider;
@@ -45,8 +47,23 @@ public class StandardExternalResolver implements ExternalResolver {
     @Override
     public byte[] resolve(String hostname, DnsRecordType dnsRecordType) {
         try {
-            // TODO: Record type
-            return this.nameResolver.resolve(hostname).get().getAddress();
+            AddressedEnvelope<DnsResponse, InetSocketAddress> response = this.nameResolver.query(new DefaultDnsQuestion(hostname, dnsRecordType)).get();
+
+            DnsRecord answer = response.content().recordAt(DnsSection.ANSWER);
+            if (answer != null) {
+                if (answer instanceof DefaultDnsRawRecord) {
+                    ByteBuf content = ((DefaultDnsRawRecord) answer).content();
+
+                    byte[] address = new byte[content.readableBytes()];
+                    content.readBytes(address);
+
+                    return address;
+                }
+
+                throw new IllegalStateException("unsupported answer record section type " + answer.getClass().getName());
+            }
+
+            return null;
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Error while resolving hostname " + hostname, e);
         }
